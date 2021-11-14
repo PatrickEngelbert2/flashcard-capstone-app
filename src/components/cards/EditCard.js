@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
-import { readDeck } from "../../utils/api";
+import { Link, useParams, useHistory } from "react-router-dom";
+import { readDeck, updateCard } from "../../utils/api";
 import FormCard from "./FormCard";
 
 function EditCard() {
   const { deckId, cardId } = useParams();
   const [deck, setDeck] = useState({});
+  const history = useHistory();
+  const id = cardId;
   useEffect(() => {
     readDeck(deckId).then((response) => setDeck(response));
   }, [deckId]);
+
+
+  
+
+
+  async function handleSubmit(evt, front, back) {
+    await updateCard({ front, back, id, deckId: Number(deckId) });
+    history.push(`/decks/${deck.id}`);
+  }
+
   return (
     <>
       {/* navbar with boostrap breadcrumb */}
@@ -26,7 +38,7 @@ function EditCard() {
         </ol>
       </nav>
       <h2>Edit Card</h2>
-      <FormCard />
+      <FormCard handleSubmit={handleSubmit} />
     </>
   );
 }

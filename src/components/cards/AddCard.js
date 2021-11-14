@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
-import { readDeck } from "../../utils/api";
+import { readDeck, createCard } from "../../utils/api";
 import FormCard from "./FormCard";
 
 function AddCard() {
@@ -9,6 +9,18 @@ function AddCard() {
   useEffect(() => {
     readDeck(deckId).then((response) => setDeck(response));
   }, [deckId]);
+
+
+
+
+
+
+  async function handleSubmit(front, back, setFront, setBack) {
+    createCard(deckId, { front, back });
+    setFront("");
+    setBack("");
+  }
+
   return (
     <>
       {/* navbar with boostrap breadcrumb */}
@@ -26,7 +38,7 @@ function AddCard() {
         </ol>
       </nav>
       <h2>{deck.name}: Add Card</h2>
-      <FormCard />
+      <FormCard handleSubmit={handleSubmit} />
     </>
   );
 }

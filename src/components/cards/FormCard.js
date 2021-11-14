@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Link, useRouteMatch, useParams, useHistory } from "react-router-dom";
-import { readDeck, createCard, readCard, updateCard } from "../../utils/api";
+import { Link, useRouteMatch, useParams } from "react-router-dom";
+import { readDeck, readCard } from "../../utils/api";
 
-export default function FormCard() {
+export default function FormCard({handleSubmit}) {
   const { url } = useRouteMatch();
   const { deckId, cardId } = useParams();
   const [deck, setDeck] = useState({});
   const [isEdit, setIsEdit] = useState(false);
-  const [id, setId] = useState();
-  const history = useHistory();
   const [front, setFront] = useState("");
   const [back, setBack] = useState("");
   const [frontPlaceholder, setFrontPlaceholder] =
@@ -20,7 +18,7 @@ export default function FormCard() {
       readCard(cardId).then((response) => {
         setFrontPlaceholder(response.front);
         setBackPlaceholder(response.back);
-        setFront(response.front)
+        setFront(response.front);
         setBack(response.back);
       });
     }
@@ -28,30 +26,21 @@ export default function FormCard() {
   useEffect(() => {
     readDeck(deckId).then((response) => setDeck(response));
   }, [deckId]);
-  useEffect(() => {
-    readCard(cardId).then((response) => {
-      setId(response.id);
-    });
-  }, [cardId]);
+
   function handleFrontChange(evt) {
     setFront(evt.target.value);
   }
   function handleBackChange(evt) {
     setBack(evt.target.value);
   }
-  async function handleSubmit(evt) {
+
+  function onCardSubmit (evt) {
     evt.preventDefault();
-    if (isEdit) {
-      await updateCard({ front, back, id, deckId: Number(deckId) });
-      history.push(`/decks/${deck.id}`);
-    } else {
-      createCard(deckId, { front, back });
-      setFront("");
-      setBack("");
-    }
+    handleSubmit(front, back, setFront, setBack);
   }
+  
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={onCardSubmit}>
       <div className="mb-3">
         <label htmlFor="front" className="form-label">
           Front
